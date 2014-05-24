@@ -1,7 +1,5 @@
-smart-image-renamer
-===================
-
 Smart Image Renamer
+===================
 
 <pre>
 usage: smart-image-renamer.py [-h] -f FORMAT [-s SEQUENCE] [-r] [-i] [-t]
