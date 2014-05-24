@@ -2,6 +2,10 @@
 smart-image-renamer
 ===================
 
+.. image:: https://travis-ci.org/ronakg/smart-image-renamer.svg?branch=master
+   :alt: Current build status
+      :target: http://travis-ci.org/#!/ronakg/smart-image-renamer
+
 ::
 
   usage: smart-image-renamer.py [-h] -f FORMAT [-s SEQUENCE] [-r] [-i] [-t]
