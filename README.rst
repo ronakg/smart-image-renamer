@@ -6,12 +6,34 @@ smart-image-renamer
    :alt: Current build status
       :target: http://travis-ci.org/#!/ronakg/smart-image-renamer
 
+A script to intelligently bulk rename images using EXIF data contained within
+
+Install
+=======
+
+To install smart-image-renamer:
+
+Recommended method is via pip.
+
 ::
 
-  usage: smart-image-renamer.py [-h] -f FORMAT [-s SEQUENCE] [-r] [-i] [-t]
-                                [-v | -q]
-                                input [input ...]
+  pip install smart-image-renamer
+
+Else install like any other python package.
+
+::
+
+  python setup.py install
+
+Usage
+=====
+
+::
   
+  usage: smart-image-renamer.py [-h] -f FORMAT [-s SEQUENCE] [-r] [-i] [-t] [-V]
+                              [-v | -q]
+                              input [input ...]
+
   Smart Image Renamer
   
   Rename your photos in bulk using information stored in EXIF.
@@ -26,6 +48,7 @@ smart-image-renamer
     -r             Recursive mode
     -i             Include hidden files
     -t             Test mode. Don't apply changes.
+    -V, --version  show program's version number and exit
     -v, --verbose
     -q, --quiet
   
