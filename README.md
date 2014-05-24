@@ -3,6 +3,7 @@ smart-image-renamer
 
 Smart Image Renamer
 
+<pre>
 usage: smart-image-renamer.py [-h] -f FORMAT [-s SEQUENCE] [-r] [-i] [-t]
                               [-v | -q]
                               input [input ...]
@@ -45,3 +46,4 @@ Examples:
   Format String:          {YYYY}{DD}{MM}_{Model}_Beach_Shoot_{Seq}
   File Name:              20140429_PENTAX K-x_Beach_Shoot_001.JPEG
                           20140429_PENTAX K-x_Beach_Shoot_002.JPEG
+</pre>
