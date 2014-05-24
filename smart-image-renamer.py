@@ -26,6 +26,7 @@ import re
 from PIL import Image
 from PIL.ExifTags import TAGS
 
+from _version import __version__
 
 class NotAnImageFile(Exception):
     """This file is not an Image"""
@@ -84,6 +85,8 @@ Examples:
                         action='store_true', help='Include hidden files')
     parser.add_argument('-t', dest='test', default=False, action='store_true',
                         help='Test mode. Don\'t apply changes.')
+    parser.add_argument('-V', '--version', action='version',
+                        version='%(prog)s {}'.format(__version__))
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-v", "--verbose", action="store_true")
     group.add_argument("-q", "--quiet", action="store_true")

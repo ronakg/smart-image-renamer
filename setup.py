@@ -1,14 +1,31 @@
 """ Install script for pyShortUrl """
 
 import os
+import re
 from setuptools import setup
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
+VERSIONFILE = os.path.join(os.path.dirname(__file__), '_version.py')
+verstr = "unknown"
+try:
+    verstrline = open(VERSIONFILE, "rt").read()
+except EnvironmentError:
+    pass # Okay, there is no version file.
+else:
+    VSRE = r'^__version__ = [\'"]([\w\d\.]+)[\'"]'
+    mo = re.search(VSRE, verstrline)
+    if mo:
+        verstr = mo.group(1)
+    else:
+        print('Unable to find version in {}'.format(VERSIONFILE))
+        raise RuntimeError('if {}.py exists, it is required to be '
+                           'well-formed'.format(VERSIONFILE))
+
 setup(
     name = "smart-image-renamer",
-    version = "0.1",
+    version = verstr,
     author = "Ronak Gandhi",
     author_email = "ronak.gandhi@ronakg.com",
     description = ("A script to intelligently bulk rename images using EXIF data contained within."),
