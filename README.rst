@@ -4,7 +4,7 @@ smart-image-renamer
 
 .. image:: https://travis-ci.org/ronakg/smart-image-renamer.svg?branch=master
    :alt: Current build status
-      :target: http://travis-ci.org/#!/ronakg/smart-image-renamer
+   :target: http://travis-ci.org/#!/ronakg/smart-image-renamer
 
 A script to intelligently bulk rename images using EXIF data contained within
 
