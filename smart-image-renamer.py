@@ -18,6 +18,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""Smart Image Renamer main module"""
+
 import argparse
 import itertools
 import os
@@ -27,6 +29,7 @@ from PIL import Image
 from PIL.ExifTags import TAGS
 
 from _version import __version__
+
 
 class NotAnImageFile(Exception):
     """This file is not an Image"""
@@ -106,25 +109,24 @@ def get_exif_data(img_file):
     Raises: NotAnImageFile if file is not an image
             InvalidExifData if EXIF can't be processed
     """
-    with open(img_file, 'rb') as fp:
-        try:
-            img = Image.open(fp)
-        except (OSError, IOError):
-            raise NotAnImageFile
+    try:
+        img = Image.open(img_file)
+    except (OSError, IOError):
+        raise NotAnImageFile
 
-        try:
-            # Use TAGS module to make EXIF data human readable
-            exif_data = {
-                TAGS[k]: v
-                for k, v in img._getexif().items()
-                if k in TAGS
-            }
-        except AttributeError:
-            raise InvalidExifData
+    try:
+        # Use TAGS module to make EXIF data human readable
+        exif_data = {
+            TAGS[k]: v
+            for k, v in img._getexif().items()
+            if k in TAGS
+        }
+    except AttributeError:
+        raise InvalidExifData
 
-        # Add image format to EXIF
-        exif_data['format'] = img.format
-        return exif_data
+    # Add image format to EXIF
+    exif_data['format'] = img.format
+    return exif_data
 
 if __name__ == '__main__':
     skipped_files = []
@@ -163,7 +165,7 @@ if __name__ == '__main__':
                 except NotAnImageFile:
                     continue
                 except InvalidExifData:
-                    skipped_files.append(old_file_name)
+                    skipped_files.append((old_file_name, 'No EXIF data found'))
                     continue
 
                 # Find out the original timestamp or digitized timestamp from the EXIF
@@ -171,7 +173,8 @@ if __name__ == '__main__':
                                  exif_data.get('DateTimeDigitized'))
 
                 if not img_timestamp:
-                    skipped_files.append(old_file_name)
+                    skipped_files.append((old_file_name,
+                                          'No timestamp found in image EXIF'))
                     continue
 
                 # Extract year, month, day, hours, minutes, seconds from timestamp
@@ -181,7 +184,8 @@ if __name__ == '__main__':
                               img_timestamp.strip())
 
                 if not img_timestamp:
-                    skipped_files.append(old_file_name)
+                    skipped_files.append((old_file_name,
+                                          'Timestamp not in correct format'))
                     continue
 
                 # Generate data to be replaced in user provided format
@@ -203,7 +207,8 @@ if __name__ == '__main__':
                     try:
                         os.rename(old_file_name, new_file_name_complete)
                     except OSError:
-                        skipped_files.append(old_file_name)
+                        skipped_files.append((old_file_name,
+                                              'Failed to rename file'))
                         continue
 
                 if verbose:
@@ -221,4 +226,6 @@ if __name__ == '__main__':
 
     # Print skipped files
     if skipped_files and not quiet:
-        print('\nSkipped Files:\n\t' + '\n\t'.join(skipped_files))
+        print('\nSkipped Files:\n\t' + '\n\t'.join([file + ' (' + error + ')'
+                                                    for file, error in
+                                                    skipped_files]))
