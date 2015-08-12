@@ -24,6 +24,7 @@ import argparse
 import itertools
 import os
 import re
+import shutil
 
 from PIL import Image
 from PIL.ExifTags import TAGS
@@ -63,6 +64,7 @@ Format string for the file name is defined by a mix of custom text and following
   Make        Camera Make
   Model       Camera Model
   Folder      Parent folder of the image file
+  File        Current Filename
 
 Examples:
   Format String:          {YYYY}-{MM}-{DD}-{Folder}-{Seq}
@@ -86,6 +88,10 @@ Examples:
                         help='Recursive mode')
     parser.add_argument('-i', dest='hidden', default=False,
                         action='store_true', help='Include hidden files')
+    parser.add_argument('-c', dest='copy', default=False,
+                        action='store_true', help='Copy file')
+    parser.add_argument('-d', dest='destination', default="", type=str,
+                        help='Copy to destination')
     parser.add_argument('-t', dest='test', default=False, action='store_true',
                         help='Test mode. Don\'t apply changes.')
     parser.add_argument('-V', '--version', action='version',
@@ -128,6 +134,15 @@ def get_exif_data(img_file):
     exif_data['format'] = img.format
     return exif_data
 
+def move2dest(old, new, copy=False):
+    parent = os.path.dirname(new)
+    if not os.path.exists(parent):
+        os.makedirs(parent)
+    if copy:
+        shutil.copy2(old, new)
+    else:
+        shutil.move(old, new)
+
 if __name__ == '__main__':
     skipped_files = []
     args = get_cmd_args()
@@ -140,10 +155,12 @@ if __name__ == '__main__':
     test_mode = args.test
     recursive = args.recursive
     include_hidden = args.hidden
+    destination = os.path.expanduser(args.destination)
+    copymode = args.copy
 
     for input_path in input_paths:
         for root, dirs, files in os.walk(input_path):
-            # Skip hidden directories unless specified by user 
+            # Skip hidden directories unless specified by user
             if not include_hidden and os.path.basename(root).startswith('.'):
                 continue
 
@@ -154,7 +171,7 @@ if __name__ == '__main__':
 
             print('Processing folder: {}'.format(root))
             for f in sorted(files):
-                # Skip hidden files unless specified by user 
+                # Skip hidden files unless specified by user
                 if not include_hidden and f.startswith('.'):
                     continue
 
@@ -193,6 +210,7 @@ if __name__ == '__main__':
                                   'Make': exif_data.get('Make', ''),
                                   'Model': exif_data.get('Model', ''),
                                   'Folder': os.path.basename(root),
+                                  'File': os.path.splitext(f)[0],
                                   'Seq': '{0:0{1}d}'.format(next(seq), seq_width),
                                   'ext': exif_data.get('format', '')
                                   }
@@ -200,12 +218,18 @@ if __name__ == '__main__':
 
                 # Generate new file name according to user provided format
                 new_file_name = (input_format + '.{ext}').format(**new_image_data)
-                new_file_name_complete = os.path.join(root, new_file_name)
+                if destination:
+                    new_file_name_complete = os.path.join(destination, new_file_name)
+                else:
+                    new_file_name_complete = os.path.join(root, new_file_name)
 
                 # Don't rename files if we are running in test mode
                 if not test_mode:
                     try:
-                        os.rename(old_file_name, new_file_name_complete)
+                        if copymode:
+                            move2dest(old_file_name, new_file_name_complete, copy=True)
+                        else:
+                            move2dest(old_file_name, new_file_name_complete)
                     except OSError:
                         skipped_files.append((old_file_name,
                                               'Failed to rename file'))
