@@ -65,8 +65,6 @@ Format string for the file name is defined by a mix of custom text and following
   Model       Camera Model
   Folder      Parent folder of the image file
   File        Current Filename
-  Width       Width of the image in pixel
-  Height      Height of the image in pixel
 
 Examples:
   Format String:          {YYYY}-{MM}-{DD}-{Folder}-{Seq}
@@ -134,11 +132,6 @@ def get_exif_data(img_file):
 
     # Add image format to EXIF
     exif_data['format'] = img.format
-    splitter = "{},{}"
-    imgdim = splitter.format(*img.size)
-    exifwidth, exifheight = imgdim.split(',')
-    exif_data['Width'] = exifwidth
-    exif_data['Height'] = exifheight
     return exif_data
 
 def move2dest(old, new, copy=False):
@@ -217,8 +210,6 @@ if __name__ == '__main__':
                                   'Make': exif_data.get('Make', ''),
                                   'Model': exif_data.get('Model', ''),
                                   'Folder': os.path.basename(root),
-                                  'Width': exif_data.get('Width'),
-                                  'Height': exif_data.get('Height'),
                                   'File': os.path.splitext(f)[0],
                                   'Seq': '{0:0{1}d}'.format(next(seq), seq_width),
                                   'ext': exif_data.get('format', '')
